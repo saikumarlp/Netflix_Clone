@@ -32,49 +32,74 @@ const Login = () => {
     };
 
     return (
-        <div className='w-full h-screen'>
+        <div className='w-full h-screen relative'>
             <img
                 className='hidden sm:block absolute w-full h-full object-cover'
                 src='https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/US-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg'
                 alt='netflix'
             />
-            <div className='bg-black/60 fixed top-0 left-0 w-full h-screen'></div>
+            <div className='bg-black/50 fixed top-0 left-0 w-full h-screen'></div>
+
+            {/* Navbar Logo for Login Page */}
+            <div className='fixed top-0 w-full p-4 z-50'>
+                <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
+                    alt="Netflix"
+                    className="h-8 md:h-12 cursor-pointer"
+                    onClick={() => navigate('/')}
+                />
+            </div>
+
             <div className='fixed w-full px-4 py-24 z-50'>
-                <div className='max-w-[450px] h-[600px] mx-auto bg-black/75 text-white'>
+                <div className='max-w-[450px] h-[600px] mx-auto bg-black/75 backdrop-blur-md rounded-lg text-white shadow-2xl'>
                     <div className='max-w-[320px] mx-auto py-16'>
-                        <h1 className='text-3xl font-bold'>Sign In</h1>
-                        {error && <p className='p-3 bg-red-500 my-2'>{error}</p>}
+                        <h1 className='text-3xl font-bold mb-6'>Sign In</h1>
+                        {error && <p className='p-3 bg-orange-500 text-white rounded my-2 text-sm font-medium'>{error}</p>}
+
                         <form onSubmit={handleSubmit} className='w-full flex flex-col py-4'>
-                            <input
-                                onChange={handleChange}
-                                className='p-3 my-2 bg-gray-700 rounded'
-                                type='email'
-                                placeholder='Email'
-                                name='email'
-                                value={email}
-                            />
-                            <input
-                                onChange={handleChange}
-                                className='p-3 my-2 bg-gray-700 rounded'
-                                type='password'
-                                placeholder='Password'
-                                name='password'
-                                value={password}
-                            />
-                            <button className='bg-red-600 py-3 my-6 rounded font-bold hover:bg-red-700 transition'>
+                            <div className='relative my-2'>
+                                <input
+                                    onChange={handleChange}
+                                    className='p-3 w-full bg-[#333] rounded focus:bg-[#454545] focus:outline-none focus:ring-2 focus:ring-gray-500 text-white placeholder-gray-400 transition'
+                                    type='email'
+                                    placeholder='Email or phone number'
+                                    name='email'
+                                    value={email}
+                                />
+                            </div>
+                            <div className='relative my-2'>
+                                <input
+                                    onChange={handleChange}
+                                    className='p-3 w-full bg-[#333] rounded focus:bg-[#454545] focus:outline-none focus:ring-2 focus:ring-gray-500 text-white placeholder-gray-400 transition'
+                                    type='password'
+                                    placeholder='Password'
+                                    name='password'
+                                    value={password}
+                                />
+                            </div>
+                            <button className='bg-red-600 py-3 my-6 rounded font-bold hover:bg-red-700 transition duration-300'>
                                 Sign In
                             </button>
-                            <div className='flex justify-between items-center text-sm text-gray-600'>
-                                <p>
-                                    <input className='mr-2' type='checkbox' />
+
+                            <div className='flex justify-between items-center text-sm text-gray-400'>
+                                <p className='flex items-center'>
+                                    <input className='mr-2 accent-gray-500' type='checkbox' />
                                     Remember me
                                 </p>
-                                <p>Need Help?</p>
+                                <p className='hover:underline cursor-pointer'>Need Help?</p>
                             </div>
-                            <p className='py-8'>
-                                <span className='text-gray-600'>New to Netflix?</span>{' '}
-                                <Link to='/signup'>Sign Up</Link>
-                            </p>
+
+                            <div className='mt-10'>
+                                <p className='py-4 text-gray-400'>
+                                    New to Netflix?{' '}
+                                    <Link to='/signup' className='text-white hover:underline font-medium'>
+                                        Sign up now.
+                                    </Link>
+                                </p>
+                                <p className='text-xs text-gray-500'>
+                                    This page is protected by Google reCAPTCHA to ensure you're not a bot.
+                                </p>
+                            </div>
                         </form>
                     </div>
                 </div>

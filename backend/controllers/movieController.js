@@ -43,6 +43,33 @@ const searchMovies = async (req, res) => {
     }
 };
 
+const getMovieById = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ message: 'Movie ID is required' });
+    }
+
+    try {
+        const apiKey = process.env.OMDB_API_KEY;
+        const url = `https://www.omdbapi.com/?apikey=${apiKey}&i=${id}&plot=full`;
+
+        const response = await axios.get(url);
+
+        if (response.data.Error) {
+            throw new Error(response.data.Error);
+        }
+
+        res.json(response.data);
+    } catch (error) {
+        console.error('Details Error:', error.message);
+        // Fallback for mock data if needed, or just return error
+        // For simplicity, we might return a mock detail if ID matches one of our mocks
+        res.status(500).json({ message: 'Failed to fetch movie details' });
+    }
+};
+
 module.exports = {
     searchMovies,
+    getMovieById,
 };
