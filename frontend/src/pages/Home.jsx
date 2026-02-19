@@ -19,7 +19,8 @@ const Home = () => {
         try {
             const res = await api.get(`/movies/search?query=${query}`);
             if (res.data.Search) {
-                setMovies(res.data.Search);
+                const validMovies = res.data.Search.filter(movie => movie.Poster && movie.Poster !== 'N/A');
+                setMovies(validMovies);
             } else {
                 setMovies([]);
             }
@@ -44,7 +45,7 @@ const Home = () => {
         fetchMovies(searchTerm);
     };
 
-    // Debounce search effect
+    // Debounce search effect (500ms)
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (searchTerm) {
@@ -52,7 +53,7 @@ const Home = () => {
             } else {
                 setMovies([]); // Clear movies if search is cleared
             }
-        }, 800);
+        }, 500);
 
         return () => clearTimeout(delayDebounceFn);
     }, [searchTerm, fetchMovies]);
@@ -64,7 +65,7 @@ const Home = () => {
             {/* Show Hero only when not searching */}
             {!searchTerm && <Hero onSelect={setSelectedMovie} />}
 
-            <div className={`px-4 md:px-12 ${!searchTerm ? '-mt-20 relative z-10' : 'pt-24'} space-y-2 pb-12`}>
+            <div className={`px-4 md:px-12 ${!searchTerm ? 'relative z-10' : 'pt-24'} space-y-2 pb-12`}>
 
                 {searchTerm ? (
                     /* Search Results Grid */
@@ -80,13 +81,12 @@ const Home = () => {
                             <>
                                 {movies.length > 0 ? (
                                     <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
-                                        {movies.map((movie) => (
-                                            <MovieCard
-                                                key={movie.imdbID}
-                                                movie={movie}
-                                                onSelect={setSelectedMovie}
-                                            />
-                                        ))}
+                                        <MovieCard
+                                            key={movie.imdbID}
+                                            movie={movie}
+                                            onSelect={setSelectedMovie}
+                                            onImageError={(id) => setMovies(prev => prev.filter(m => m.imdbID !== id))}
+                                        />
                                     </div>
                                 ) : (
                                     <p className='text-gray-400 text-center mt-10 text-xl'>No movies found matching your search.</p>
@@ -102,7 +102,6 @@ const Home = () => {
                         <Row title="Action Movies" fetchQuery="action" onSelect={setSelectedMovie} />
                         <Row title="Comedy Movies" fetchQuery="comedy" onSelect={setSelectedMovie} />
                         <Row title="Horror Movies" fetchQuery="horror" onSelect={setSelectedMovie} />
-                        <Row title="Romance Movies" fetchQuery="romance" onSelect={setSelectedMovie} />
                         <Row title="Sci-Fi & Fantasy" fetchQuery="space" onSelect={setSelectedMovie} />
                     </div>
                 )}

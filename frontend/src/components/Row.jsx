@@ -12,10 +12,13 @@ const Row = ({ title, fetchQuery, onSelect }) => {
             try {
                 const res = await api.get(`/movies/search?query=${fetchQuery}`);
                 if (res.data.Search) {
+                    // Filter out movies without posters
+                    const validMovies = res.data.Search.filter(movie => movie.Poster && movie.Poster !== 'N/A');
+
                     // Remove duplicates based on imdbID
-                    const uniqueMovies = Array.from(new Set(res.data.Search.map(a => a.imdbID)))
+                    const uniqueMovies = Array.from(new Set(validMovies.map(a => a.imdbID)))
                         .map(id => {
-                            return res.data.Search.find(a => a.imdbID === id)
+                            return validMovies.find(a => a.imdbID === id)
                         })
                     setMovies(uniqueMovies);
                 }
@@ -47,7 +50,11 @@ const Row = ({ title, fetchQuery, onSelect }) => {
                     ) : (
                         movies.map((item) => (
                             <div key={item.imdbID} className='inline-block w-[160px] sm:w-[200px] md:w-[240px] lg:w-[280px] p-2 cursor-pointer relative align-top first:pl-0'>
-                                <MovieCard movie={item} onSelect={onSelect} />
+                                <MovieCard
+                                    movie={item}
+                                    onSelect={onSelect}
+                                    onImageError={(id) => setMovies(prev => prev.filter(m => m.imdbID !== id))}
+                                />
                             </div>
                         ))
                     )}

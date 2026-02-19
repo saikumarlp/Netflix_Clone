@@ -13,8 +13,21 @@ const Hero = ({ onSelect }) => {
             try {
                 const res = await api.get(`/movies/search?query=${randomQuery}`);
                 if (res.data.Search && res.data.Search.length > 0) {
-                    const randomMovie = res.data.Search[Math.floor(Math.random() * res.data.Search.length)];
-                    setMovie(randomMovie);
+                    const validMovies = res.data.Search.filter(m => m.Poster && m.Poster !== 'N/A');
+
+                    if (validMovies.length > 0) {
+                        const randomMovieSimple = validMovies[Math.floor(Math.random() * validMovies.length)];
+
+                        // Fetch full details using the ID to get authentic Plot and Rating
+                        const detailRes = await api.get(`/movies/${randomMovieSimple.imdbID}`);
+
+                        if (detailRes.data && !detailRes.data.Error) {
+                            setMovie(detailRes.data);
+                        } else {
+                            // If details fail, fallback to simple but acknowledge it's incomplete
+                            setMovie(randomMovieSimple);
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching hero movie:', error);
@@ -29,8 +42,11 @@ const Hero = ({ onSelect }) => {
     );
 
     return (
-        <div className='relative h-[65vh] w-full text-white'>
-            <div className='absolute w-full h-[65vh]'>
+        <div className='relative w-full text-white min-h-[85vh] flex flex-col justify-center'>
+            {/* Background Image - Absolute */}
+            <div className='absolute inset-0 w-full h-full'>
+                <div className='absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent z-10'></div>
+                <div className='absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10'></div>
                 <img
                     src={movie.Poster !== 'N/A' ? movie.Poster : 'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop'}
                     alt={movie.Title}
@@ -42,18 +58,25 @@ const Hero = ({ onSelect }) => {
                     }}
                 />
             </div>
-            <div className='absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent'></div>
-            <div className='absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent'></div>
 
-            <div className='absolute top-[20%] md:top-[30%] p-4 md:p-12 space-y-4 max-w-2xl z-20'>
-                <h1 className='text-4xl md:text-6xl font-black drop-shadow-lg tracking-tight'>{movie.Title}</h1>
-                <div className='text-gray-300 text-lg flex items-center gap-4 font-semibold'>
-                    <span className='text-green-400'>98% Match</span>
-                    <span>{movie.Year}</span>
-                    <span className='border border-gray-400 px-1 text-xs text-gray-400'>{movie.Type ? movie.Type.toUpperCase() : 'MOVIE'}</span>
+            {/* Content - Relative/Flex to push content down */}
+            <div className='relative z-20 px-4 md:px-12 w-full max-w-3xl pt-[20vh] pb-12 space-y-4'>
+                <h1 className='text-4xl md:text-6xl font-black drop-shadow-lg tracking-tight leading-tight'>
+                    {movie.Title}
+                </h1>
+
+                <div className='flex items-center gap-4 text-sm md:text-base'>
+                    <span className='text-green-400 font-bold'>
+                        {movie.imdbRating ? `${movie.imdbRating} Match` : '98% Match'}
+                    </span>
+                    <span className='text-gray-300'>{movie.Year}</span>
+                    <span className='border border-gray-400 px-1 text-xs text-gray-400 rounded-sm'>
+                        {movie.Type ? movie.Type.toUpperCase() : 'MOVIE'}
+                    </span>
                 </div>
-                <p className='text-gray-200 text-base md:text-lg drop-shadow-md line-clamp-3 max-w-xl font-medium leading-relaxed'>
-                    {movie.Plot !== 'N/A' ? movie.Plot : `Watch this amazing ${movie.Type} on Netflix. Experience the thrill and excitement of ${movie.Title}.`}
+
+                <p className='text-gray-200 text-base md:text-lg drop-shadow-md line-clamp-3 font-medium leading-relaxed max-w-xl'>
+                    {movie.Plot !== 'N/A' ? movie.Plot : ''}
                 </p>
 
                 <div className='flex gap-4 mt-6'>
@@ -71,5 +94,6 @@ const Hero = ({ onSelect }) => {
         </div>
     );
 };
+
 
 export default Hero;
